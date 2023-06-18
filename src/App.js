@@ -1,59 +1,49 @@
-import React, { useState,useEffect,useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import MoviesList from "./components/MoviesList";
 import "./App.css";
 
 function App() {
   const [movies, setMovies] = useState([]);
-  const [isLoading,setIsLoading] = useState(false);
-  const [error,setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     id: "",
     title: "",
     openingText: "",
     releaseDate: "",
   });
- 
 
- 
-
- const fetchMoviesHandler =   useCallback( async() => {
-  setIsLoading(true);
-  setError(null)
-  try{
-     const response = await fetch("https://swapi.dev/api/films/")
-       if(!response.ok){
-        throw new Error('something went wrong...!')
+  const fetchMoviesHandler = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("https://crudcrud.com/api/c317046188f8467c90c17404a703a4b8/movies");
+      if (!response.ok) {
+        throw new Error("something went wrong...!");
       }
-     
-     const data =await response.json()
 
-     
-      
-        const transformedMovies = data.results.map((movieData) => {
-          return {
-            id: movieData.episode_id,
-            title: movieData.title,
-            openingText: movieData.opening_crawl,
-            releaseDate: movieData.release_date,
-          };
-        
-        
+      const data = await response.json();
+      console.log(data)
+      const transformedMovies = data.map((movieData) => {
+        return {
+          id: movieData._id,
+          title: movieData.title,
+          openingText: movieData.openingText,
+          releaseDate: movieData.releaseDate,
+        };
       });
       setMovies(transformedMovies);
-      setIsLoading(false)
-      
-  }
-  catch(error){
-     setError(error.message)
-     
-  }
-  setIsLoading(false)
-  },[]);
-  
-   useEffect(()=>{
+      setIsLoading(false);
+    } catch (error) {
+      setError(error.message);
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
     fetchMoviesHandler();
-  },[fetchMoviesHandler])
+  }, [fetchMoviesHandler]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -63,18 +53,28 @@ function App() {
     }));
   };
 
-  const addMovieHandler = (event) => {
+  const  addMovieHandler = async (event) => {
     event.preventDefault();
-    const {  title, openingText, releaseDate } = formData;
+    const { title, openingText, releaseDate } = formData;
     const newMovie = {
-      id: Math.random()*10,
+      
       title: title.trim(),
       openingText: openingText.trim(),
       releaseDate: releaseDate.trim(),
     };
-    setMovies((prevMovies) => [...prevMovies, newMovie]);
+    // setMovies((prevMovies) => [...prevMovies, newMovie]);
+   const response = await fetch("https://crudcrud.com/api/c317046188f8467c90c17404a703a4b8/movies",{
+      method:'POST',
+      body:JSON.stringify(newMovie),
+      headers:{
+        'Content-Type':'application/json'
+      }
+    })
+
+    const data = await response.json();
+    console.log(data)
+
     setFormData({
-      
       title: "",
       openingText: "",
       releaseDate: "",
@@ -83,9 +83,8 @@ function App() {
 
   return (
     <React.Fragment>
-       <section>
+      <section>
         <form onSubmit={addMovieHandler}>
-          
           <div>
             <label htmlFor="title">Title:</label>
             <input
@@ -123,11 +122,10 @@ function App() {
         <button onClick={fetchMoviesHandler}> Fetch Movies</button>
       </section>
       <section>
-       {!isLoading && movies.length>0 && <MoviesList movies={movies} /> }
-       {!isLoading && movies.length===0 && !error && <p>Found no Movies</p>}
-      {!isLoading && error && <p>{error}</p>}
-       {isLoading && <p>Loading...</p>}
-       
+        {!isLoading && movies.length > 0 && <MoviesList movies={movies} />}
+        {!isLoading && movies.length === 0 && !error && <p>Found no Movies</p>}
+        {!isLoading && error && <p>{error}</p>}
+        {isLoading && <p>Loading...</p>}
       </section>
     </React.Fragment>
   );
