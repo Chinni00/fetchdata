@@ -32,4 +32,5 @@ label{
 }
 input,textarea,label{
   width: 30em;
+  margin-bottom: 10px;
 }
