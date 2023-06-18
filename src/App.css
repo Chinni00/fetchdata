@@ -27,3 +27,9 @@ button:active {
   background-color: #460897;
   border-color: #460897;
 }
+label{
+  text-align: left;
+}
+input,textarea,label{
+  width: 30em;
+}
