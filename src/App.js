@@ -18,22 +18,26 @@ function App() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch("https://crudcrud.com/api/c317046188f8467c90c17404a703a4b8/movies");
+      const response = await fetch("https://movies-2b79b-default-rtdb.firebaseio.com//movies.json");
       if (!response.ok) {
         throw new Error("something went wrong...!");
       }
 
       const data = await response.json();
-      console.log(data)
-      const transformedMovies = data.map((movieData) => {
-        return {
-          id: movieData._id,
-          title: movieData.title,
-          openingText: movieData.openingText,
-          releaseDate: movieData.releaseDate,
-        };
-      });
-      setMovies(transformedMovies);
+      console.log('data',data)
+      const loadedMovies=[];
+      for(const key in data){
+         loadedMovies.push({
+          id:key,
+          title:data[key].title,
+          openingText:data[key].openingText,
+          releaseDate:data[key].releaseDate
+         })
+      }
+
+
+
+      setMovies(loadedMovies);
       setIsLoading(false);
     } catch (error) {
       setError(error.message);
@@ -63,7 +67,7 @@ function App() {
       releaseDate: releaseDate.trim(),
     };
     // setMovies((prevMovies) => [...prevMovies, newMovie]);
-   const response = await fetch("https://crudcrud.com/api/c317046188f8467c90c17404a703a4b8/movies",{
+   const response = await fetch("https://movies-2b79b-default-rtdb.firebaseio.com//movies.json",{
       method:'POST',
       body:JSON.stringify(newMovie),
       headers:{
@@ -79,7 +83,14 @@ function App() {
       openingText: "",
       releaseDate: "",
     });
+
+    fetchMoviesHandler()
+
   };
+
+  const deleteHandler =(id)=>{
+    console.log(id)
+  }
 
   return (
     <React.Fragment>
@@ -122,7 +133,7 @@ function App() {
         <button onClick={fetchMoviesHandler}> Fetch Movies</button>
       </section>
       <section>
-        {!isLoading && movies.length > 0 && <MoviesList movies={movies} />}
+        {!isLoading && movies.length > 0 && <MoviesList onDelete={deleteHandler} movies={movies} />}
         {!isLoading && movies.length === 0 && !error && <p>Found no Movies</p>}
         {!isLoading && error && <p>{error}</p>}
         {isLoading && <p>Loading...</p>}
