@@ -7,6 +7,13 @@ function App() {
   const [movies, setMovies] = useState([]);
   const [isLoading,setIsLoading] = useState(false);
   const [error,setError] = useState(null);
+  const [formData, setFormData] = useState({
+    id: "",
+    title: "",
+    openingText: "",
+    releaseDate: "",
+  });
+ 
 
  
 
@@ -35,6 +42,7 @@ function App() {
       });
       setMovies(transformedMovies);
       setIsLoading(false)
+      
   }
   catch(error){
      setError(error.message)
@@ -47,8 +55,70 @@ function App() {
     fetchMoviesHandler();
   },[fetchMoviesHandler])
 
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+  const addMovieHandler = (event) => {
+    event.preventDefault();
+    const {  title, openingText, releaseDate } = formData;
+    const newMovie = {
+      id: Math.random()*10,
+      title: title.trim(),
+      openingText: openingText.trim(),
+      releaseDate: releaseDate.trim(),
+    };
+    setMovies((prevMovies) => [...prevMovies, newMovie]);
+    setFormData({
+      
+      title: "",
+      openingText: "",
+      releaseDate: "",
+    });
+  };
+
   return (
     <React.Fragment>
+       <section>
+        <form onSubmit={addMovieHandler}>
+          
+          <div>
+            <label htmlFor="title">Title:</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="openingText">Opening Text:</label>
+            <input
+              type="text"
+              id="openingText"
+              name="openingText"
+              value={formData.openingText}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div>
+            <label htmlFor="releaseDate">Release Date:</label>
+            <input
+              type="date"
+              id="releaseDate"
+              name="releaseDate"
+              value={formData.releaseDate}
+              onChange={handleInputChange}
+            />
+          </div>
+          <button type="submit">Add Movie</button>
+        </form>
+      </section>
       <section>
         <button onClick={fetchMoviesHandler}> Fetch Movies</button>
       </section>
